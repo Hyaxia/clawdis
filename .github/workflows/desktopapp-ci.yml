@@ -1,0 +1,53 @@
+name: Desktop App CI
+
+on:
+  push:
+
+jobs:
+  desktopapp-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Checkout submodules (retry)
+        run: |
+          set -euo pipefail
+          git submodule sync --recursive
+          for attempt in 1 2 3 4 5; do
+            if git -c protocol.version=2 submodule update --init --force --depth=1 --recursive; then
+              exit 0
+            fi
+            echo "Submodule update failed (attempt $attempt/5). Retrying…"
+            sleep $((attempt * 10))
+          done
+          exit 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          check-latest: true
+
+      - name: Enable corepack and pin pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.23.0 --activate
+          pnpm -v
+
+      - name: Install dependencies
+        env:
+          CI: true
+        run: |
+          pnpm install --ignore-scripts=false --config.engine-strict=false --config.enable-pre-post-scripts=true || pnpm install --ignore-scripts=false --config.engine-strict=false --config.enable-pre-post-scripts=true
+
+      - name: Unit tests
+        continue-on-error: true
+        run: pnpm test
+
+      - name: E2E tests
+        if: always()
+        continue-on-error: true
+        run: pnpm test:e2e

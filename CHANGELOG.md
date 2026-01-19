@@ -38,6 +38,7 @@
 - Build: import tool-display JSON as a module instead of runtime file reads. Thanks @mukhtharcm for PR #312.
 - Build: fix macOS packaging QR smoke test for the bun-compiled relay. Thanks @dbhurley for PR #358.
 - Browser: fix `browser snapshot`/`browser act` timeouts under Bun by patching Playwright’s CDP WebSocket selection. Thanks @azade-c for PR #307.
+- CI: add non-blocking desktop app unit + e2e workflow (JIM-21).
 - Browser: add `--browser-profile` flag and honor profile in tabs routes + browser tool. Thanks @jamesgroat for PR #324.
 - Gmail: include tailscale command exit codes/output when hook setup fails (easier debugging).
 - Telegram: stop typing after tool results. Thanks @AbhisekBasu1 for PR #322.
